@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 using BizHawk.Client.Common;
@@ -131,7 +133,7 @@ namespace BizHawk.Client.EmuHawk
 			{
 				var pc = PCRegister;
 				SeekToBox.Nullable = false;
-				SeekToBox.SetHexProperties((long)Math.Pow(2, pc.BitSize));
+				SeekToBox.SetHexProperties((long) Math.Pow(2, pc.BitSize));
 				SeekToBox.SetFromRawInt(0);
 			}
 			else
@@ -277,7 +279,7 @@ namespace BizHawk.Client.EmuHawk
 		private void SeekToBtn_Click(object sender, EventArgs e)
 		{
 			CancelSeekBtn.Enabled = true;
-			var pcVal = (uint)(SeekToBox.ToRawInt() ?? 0);
+			var pcVal = (uint) (SeekToBox.ToRawInt() ?? 0);
 			var pcBitSize = PCRegister.BitSize;
 
 			BreakPointControl1.RemoveCurrentSeek();
@@ -304,6 +306,60 @@ namespace BizHawk.Client.EmuHawk
 		public void AddBreakpoint(uint address, uint mask, MemoryCallbackType type)
 		{
 			this.BreakPointControl1.AddBreakpoint(address, mask, type);
+		}
+
+
+		private bool CanAnimateFlag = false;
+
+		private void Animate_Click(object sender, EventArgs e)
+		{
+			CanAnimateFlag = !CanAnimateFlag;
+			if (CanAnimateFlag)
+			{
+				MainForm.PauseEmulator();
+				AnimateBtn.Text = "Stop";
+				Thread t = new Thread(new ThreadStart(Test));
+				t.IsBackground = true;
+				t.Start();
+			}
+			else
+			{
+				AnimateBtn.Text = "Animate";
+			}
+		}
+
+		private void Test()
+		{
+			var e = Coroutine().GetEnumerator();
+			while (CanAnimateFlag)
+			{
+				e.MoveNext();
+				Thread.Sleep(100);
+				e = Coroutine().GetEnumerator();
+			}
+		}
+
+		private IEnumerable<int> Coroutine()
+		{
+			Invoke(new Action(() => ThreadProc()));
+			yield return 0;
+		}
+
+		public void ThreadProc()
+		{
+			BreakPointControl1.RemoveCurrentSeek();
+			BreakPointControl1.AddSeekBreakpoint(_currentDisassemblerAddress, PCRegister.BitSize);
+			BreakPointControl1.UpdateValues();
+
+			_pcRegisterSize = Debuggable.GetCpuFlagsAndRegisters()[Disassembler.PCRegisterName].BitSize / 4;
+			SetDisassemblerItemCount();
+			UpdatePC();
+			UpdateDisassembler();
+			FullUpdate();
+
+			BreakPointControl1.RemoveCurrentSeek();
+
+			MainForm.FrameAdvance();
 		}
 	}
 }
