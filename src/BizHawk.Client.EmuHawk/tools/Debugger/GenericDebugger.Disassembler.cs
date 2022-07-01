@@ -14,6 +14,7 @@ namespace BizHawk.Client.EmuHawk
 		private readonly List<DisasmOp> _disassemblyLines = new List<DisasmOp>();
 		private int _pcRegisterSize = 4;
 		private uint _currentDisassemblerAddress;
+		private uint _scrollViewDisassemblerAddress;
 
 		private class DisasmOp
 		{
@@ -36,6 +37,12 @@ namespace BizHawk.Client.EmuHawk
 			if (CanDisassemble)
 			{
 				_currentDisassemblerAddress = (uint)PCRegister.Value;
+
+				_scrollViewDisassemblerAddress = _currentDisassemblerAddress;
+				uint offset = ((uint) (DisassemblerView.VisibleRows / 2) + 2);
+				uint check = _currentDisassemblerAddress - offset;
+				if (check < BusMaxValue)
+					_scrollViewDisassemblerAddress = _currentDisassemblerAddress - offset;
 			}
 		}
 
@@ -45,15 +52,16 @@ namespace BizHawk.Client.EmuHawk
 			{
 				Disassemble();
 				SetDisassemblerItemCount();
+				UpdatePC();
+				BreakPointControl1.UpdateValues();
 			}
 		}
 		
 		private void Disassemble()
 		{
 			int lineCount = DisassemblerView.RowCount * 6 + 2;
-
 			_disassemblyLines.Clear();
-			uint a = _currentDisassemblerAddress;
+			uint a = _scrollViewDisassemblerAddress;
 			for (int i = 0; i <= lineCount; ++i)
 			{
 				string line = Disassembler.Disassemble(MemoryDomains.SystemBus, a, out var advance);
@@ -97,17 +105,17 @@ namespace BizHawk.Client.EmuHawk
 
 		private void DecrementCurrentAddress()
 		{
-			if (_currentDisassemblerAddress == 0)
+			if (_scrollViewDisassemblerAddress == 0)
 			{
 				return;
 			}
 
-			uint newaddress = _currentDisassemblerAddress;
+			uint newaddress = _scrollViewDisassemblerAddress;
 			
 			while (true)
 			{
 				Disassembler.Disassemble(MemoryDomains.SystemBus, newaddress, out var bytestoadvance);
-				if (newaddress + bytestoadvance == _currentDisassemblerAddress)
+				if (newaddress + bytestoadvance == _scrollViewDisassemblerAddress)
 				{
 					break;
 				}
@@ -121,22 +129,22 @@ namespace BizHawk.Client.EmuHawk
 				}
 
 				// Just in case
-				if (_currentDisassemblerAddress - newaddress > 5)
+				if (_scrollViewDisassemblerAddress - newaddress > 5)
 				{
-					newaddress = _currentDisassemblerAddress - 1;
+					newaddress = _scrollViewDisassemblerAddress - 1;
 					break;
 				}
 			}
 
-			_currentDisassemblerAddress = newaddress;
+			_scrollViewDisassemblerAddress = newaddress;
 		}
 
 		private void IncrementCurrentAddress()
 		{
-			_currentDisassemblerAddress += (uint)_disassemblyLines.First().Size;
-			if (_currentDisassemblerAddress >= BusMaxValue)
+			_scrollViewDisassemblerAddress += (uint)_disassemblyLines.First().Size;
+			if (_scrollViewDisassemblerAddress >= BusMaxValue)
 			{
-				_currentDisassemblerAddress = (uint)(BusMaxValue - 1);
+				_scrollViewDisassemblerAddress = (uint)(BusMaxValue - 1);
 			}
 		}
 

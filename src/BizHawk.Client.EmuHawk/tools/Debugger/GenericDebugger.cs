@@ -193,7 +193,13 @@ namespace BizHawk.Client.EmuHawk
 
 		private void RunBtn_Click(object sender, EventArgs e)
 		{
-			MainForm.UnpauseEmulator();
+			MainForm.TogglePause();
+			CanAnimateFlag = false;
+			if (MainForm.EmulatorPaused)
+				RunBtn.Text = "Run";
+			else
+				RunBtn.Text = "Pause";
+			this.Refresh();
 		}
 
 		private void StepIntoMenuItem_Click(object sender, EventArgs e)
@@ -313,19 +319,34 @@ namespace BizHawk.Client.EmuHawk
 
 		private void Animate_Click(object sender, EventArgs e)
 		{
+			if (!MainForm.EmulatorPaused)
+				MainForm.PauseEmulator();
+
 			CanAnimateFlag = !CanAnimateFlag;
 			if (CanAnimateFlag)
 			{
-				MainForm.PauseEmulator();
+				DisassemblerRunAnimate();
 				AnimateBtn.Text = "Stop";
-				Thread t = new Thread(new ThreadStart(Test));
-				t.IsBackground = true;
-				t.Start();
 			}
 			else
 			{
+				DisassemblerStopAnimate();
 				AnimateBtn.Text = "Animate";
 			}
+			this.Refresh();
+		}
+
+		public void DisassemblerRunAnimate()
+		{
+			CanAnimateFlag = true;
+			Thread t = new Thread(new ThreadStart(Test));
+			t.IsBackground = true;
+			t.Start();
+		}
+
+		public void DisassemblerStopAnimate()
+		{
+			CanAnimateFlag = false;
 		}
 
 		private void Test()
@@ -334,7 +355,7 @@ namespace BizHawk.Client.EmuHawk
 			while (CanAnimateFlag)
 			{
 				e.MoveNext();
-				Thread.Sleep(100);
+				Thread.Sleep(10);
 				e = Coroutine().GetEnumerator();
 			}
 		}
@@ -347,19 +368,17 @@ namespace BizHawk.Client.EmuHawk
 
 		public void ThreadProc()
 		{
-			BreakPointControl1.RemoveCurrentSeek();
-			BreakPointControl1.AddSeekBreakpoint(_currentDisassemblerAddress, PCRegister.BitSize);
-			BreakPointControl1.UpdateValues();
+			MainForm.PauseEmulator();
+			MainForm.InstructionAdvance();
 
 			_pcRegisterSize = Debuggable.GetCpuFlagsAndRegisters()[Disassembler.PCRegisterName].BitSize / 4;
 			SetDisassemblerItemCount();
-			UpdatePC();
-			UpdateDisassembler();
 			FullUpdate();
 
 			BreakPointControl1.RemoveCurrentSeek();
-
-			MainForm.FrameAdvance();
+			BreakPointControl1.AddSeekBreakpoint(_currentDisassemblerAddress, PCRegister.BitSize);
+			BreakPointControl1.UpdateValues();
+			BreakPointControl1.RemoveCurrentSeek();
 		}
 	}
 }

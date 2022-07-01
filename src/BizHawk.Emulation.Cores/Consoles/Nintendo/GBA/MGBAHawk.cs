@@ -113,6 +113,11 @@ namespace BizHawk.Emulation.Cores.Nintendo.GBA
 
 		public bool FrameAdvance(IController controller, bool render, bool renderSound = true)
 		{
+			return FrameAdvance(controller, render, renderSound);
+		}
+
+		public bool FrameAdvance(IController controller, bool render, bool renderSound = true, bool perInstructions = false)
+		{
 			if (controller.IsPressed("Power"))
 			{
 				LibmGBA.BizReset(Core);
@@ -123,17 +128,33 @@ namespace BizHawk.Emulation.Cores.Nintendo.GBA
 
 			LibmGBA.BizSetTraceCallback(Core, Tracer.IsEnabled() ? _tracecb : null);
 
-			IsLagFrame = LibmGBA.BizAdvance(
-				Core,
-				LibmGBA.GetButtons(controller),
-				render ? _videobuff : _dummyvideobuff,
-				ref _nsamp,
-				renderSound ? _soundbuff : _dummysoundbuff,
-				RTCTime(),
-				(short)controller.AxisValue("Tilt X"),
-				(short)controller.AxisValue("Tilt Y"),
-				(short)controller.AxisValue("Tilt Z"),
-				(byte)(255 - controller.AxisValue("Light Sensor")));
+			if (!perInstructions)
+			{
+				IsLagFrame = LibmGBA.BizAdvance(
+					Core,
+					LibmGBA.GetButtons(controller),
+					render ? _videobuff : _dummyvideobuff,
+					ref _nsamp,
+					renderSound ? _soundbuff : _dummysoundbuff,
+					RTCTime(),
+					(short) controller.AxisValue("Tilt X"),
+					(short) controller.AxisValue("Tilt Y"),
+					(short) controller.AxisValue("Tilt Z"),
+					(byte) (255 - controller.AxisValue("Light Sensor")));
+				Frame++;
+			}
+			else
+			{
+				LibmGBA.BizInstructionAdvance(
+					Core,
+					LibmGBA.GetButtons(controller),
+					render ? _videobuff : _dummyvideobuff,
+					(short) controller.AxisValue("Tilt X"),
+					(short) controller.AxisValue("Tilt Y"),
+					(short) controller.AxisValue("Tilt Z"),
+					(byte) (255 - controller.AxisValue("Light Sensor")));
+				IsLagFrame = false;
+			}
 
 			if (IsLagFrame)
 			{
@@ -142,8 +163,6 @@ namespace BizHawk.Emulation.Cores.Nintendo.GBA
 
 			// this should be called in hblank on the appropriate line, but until we implement that, just do it here
 			_scanlinecb?.Invoke();
-
-			Frame++;
 
 			return true;
 		}

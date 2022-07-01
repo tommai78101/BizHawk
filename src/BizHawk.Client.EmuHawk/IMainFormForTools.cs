@@ -61,6 +61,8 @@ namespace BizHawk.Client.EmuHawk
 		/// <remarks>only referenced from <see cref="TAStudio"/></remarks>
 		void FrameAdvance();
 
+		void InstructionAdvance();
+
 		/// <remarks>only referenced from <see cref="LuaConsole"/></remarks>
 		void FrameBufferResized();
 

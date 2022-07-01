@@ -855,6 +855,7 @@ namespace BizHawk.Client.EmuHawk
 		public LoadRomArgs CurrentlyOpenRomArgs { get; private set; }
 		public bool PauseAvi { get; set; }
 		public bool PressFrameAdvance { get; set; }
+		public bool PressInstructionAdvance { get; set; }
 		public bool FrameInch { get; set; }
 		public bool HoldFrameAdvance { get; set; } // necessary for tastudio > button
 		public bool PressRewind { get; set; } // necessary for tastudio < button
@@ -2994,6 +2995,13 @@ namespace BizHawk.Client.EmuHawk
 			StepRunLoop_Core(true);
 		}
 
+		public void InstructionAdvance()
+		{
+			PressInstructionAdvance = true;
+			FrameAdvance();
+			PressInstructionAdvance = false;
+		}
+
 		public void SeekFrameAdvance()
 		{
 			PressFrameAdvance = true;
@@ -3153,7 +3161,11 @@ namespace BizHawk.Client.EmuHawk
 				}
 
 				bool render = !InvisibleEmulation && (!_throttle.skipNextFrame || (_currAviWriter?.UsesVideo ?? false));
-				bool newFrame = Emulator.FrameAdvance(InputManager.ControllerOutput, render, renderSound);
+				bool newFrame = false;
+				if (Emulator is MGBAHawk)
+					newFrame = ((MGBAHawk) Emulator).FrameAdvance(InputManager.ControllerOutput, render, renderSound, PressInstructionAdvance);
+				else
+					newFrame = Emulator.FrameAdvance(InputManager.ControllerOutput, render, renderSound);
 
 				MovieSession.HandleFrameAfter();
 

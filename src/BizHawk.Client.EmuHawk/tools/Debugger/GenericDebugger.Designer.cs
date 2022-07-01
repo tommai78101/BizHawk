@@ -321,8 +321,9 @@ namespace BizHawk.Client.EmuHawk
 			// 
 			// AnimateBtn
 			// 
+			this.AnimateBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.AnimateBtn.Location = new System.Drawing.Point(680, 403);
-			this.AnimateBtn.Name = "Animate";
+			this.AnimateBtn.Name = "AnimateBtn";
 			this.AnimateBtn.Size = new System.Drawing.Size(75, 23);
 			this.AnimateBtn.TabIndex = 17;
 			this.AnimateBtn.Text = "Animate";
