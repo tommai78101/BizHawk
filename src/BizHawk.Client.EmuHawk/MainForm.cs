@@ -1463,7 +1463,7 @@ namespace BizHawk.Client.EmuHawk
 
 		public void UpdateCheatStatus()
 		{
-			if (CheatList.ActiveCount > 0)
+			if (CheatList.AnyActive)
 			{
 				CheatStatusButton.ToolTipText = "Cheats are currently active";
 				CheatStatusButton.Image = Properties.Resources.Freeze;
