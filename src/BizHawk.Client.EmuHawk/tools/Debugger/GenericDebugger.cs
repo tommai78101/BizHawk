@@ -303,8 +303,8 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ToPCBtn_Click(object sender, EventArgs e)
 		{
-			UpdateDisassembler();
 			UpdatePC();
+			UpdateDisassembler();
 			DisassemblerView.Refresh();
 		}
 
