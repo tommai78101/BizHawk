@@ -52,8 +52,6 @@ namespace BizHawk.Client.EmuHawk
 			{
 				Disassemble();
 				SetDisassemblerItemCount();
-				UpdatePC();
-				BreakPointControl1.UpdateValues();
 			}
 		}
 		

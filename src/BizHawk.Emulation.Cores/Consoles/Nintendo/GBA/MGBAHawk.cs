@@ -113,7 +113,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.GBA
 
 		public bool FrameAdvance(IController controller, bool render, bool renderSound = true)
 		{
-			return FrameAdvance(controller, render, renderSound);
+			return FrameAdvance(controller, render, renderSound, false);
 		}
 
 		public bool FrameAdvance(IController controller, bool render, bool renderSound = true, bool perInstructions = false)

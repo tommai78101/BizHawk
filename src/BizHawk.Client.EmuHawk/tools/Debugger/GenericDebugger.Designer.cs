@@ -58,6 +58,8 @@ namespace BizHawk.Client.EmuHawk
 			this.CancelSeekBtn = new System.Windows.Forms.Button();
 			this.RunBtn = new System.Windows.Forms.Button();
 			this.AnimateBtn = new System.Windows.Forms.Button();
+			this.DisassemblerAnimationIntervalsMs = new BizHawk.Client.EmuHawk.UnsignedIntegerBox();
+			this.locLabelEx1 = new BizHawk.WinForms.Controls.LocLabelEx();
 			this.menuStrip1.SuspendLayout();
 			this.RegistersGroupBox.SuspendLayout();
 			this.BreakpointsGroupBox.SuspendLayout();
@@ -330,11 +332,30 @@ namespace BizHawk.Client.EmuHawk
 			this.AnimateBtn.UseVisualStyleBackColor = true;
 			this.AnimateBtn.Click += new System.EventHandler(this.Animate_Click);
 			// 
+			// DisassemblerAnimationIntervalsMs
+			// 
+			this.DisassemblerAnimationIntervalsMs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.DisassemblerAnimationIntervalsMs.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+			this.DisassemblerAnimationIntervalsMs.Location = new System.Drawing.Point(680, 377);
+			this.DisassemblerAnimationIntervalsMs.Name = "DisassemblerAnimationIntervalsMs";
+			this.DisassemblerAnimationIntervalsMs.Nullable = false;
+			this.DisassemblerAnimationIntervalsMs.Size = new System.Drawing.Size(75, 20);
+			this.DisassemblerAnimationIntervalsMs.TabIndex = 18;
+			this.DisassemblerAnimationIntervalsMs.TextChanged += new System.EventHandler(this.DisassemblerAnimationIntervalsMs_TextChanged);
+			// 
+			// locLabelEx1
+			// 
+			this.locLabelEx1.Location = new System.Drawing.Point(677, 361);
+			this.locLabelEx1.Name = "locLabelEx1";
+			this.locLabelEx1.Text = "Intervals";
+			// 
 			// GenericDebugger
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(767, 560);
+			this.Controls.Add(this.locLabelEx1);
+			this.Controls.Add(this.DisassemblerAnimationIntervalsMs);
 			this.Controls.Add(this.AnimateBtn);
 			this.Controls.Add(this.RunBtn);
 			this.Controls.Add(this.CancelSeekBtn);
@@ -392,5 +413,7 @@ namespace BizHawk.Client.EmuHawk
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx AddBreakpointContextMenuItem;
 		private System.Windows.Forms.Button RunBtn;
 		private System.Windows.Forms.Button AnimateBtn;
+		private UnsignedIntegerBox DisassemblerAnimationIntervalsMs;
+		private LocLabelEx locLabelEx1;
 	}
 }

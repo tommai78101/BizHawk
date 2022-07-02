@@ -2992,14 +2992,15 @@ namespace BizHawk.Client.EmuHawk
 		public void FrameAdvance()
 		{
 			PressFrameAdvance = true;
+			PressInstructionAdvance = false;
 			StepRunLoop_Core(true);
 		}
 
 		public void InstructionAdvance()
 		{
+			PressFrameAdvance = false;
 			PressInstructionAdvance = true;
-			FrameAdvance();
-			PressInstructionAdvance = false;
+			StepRunLoop_Core(true);
 		}
 
 		public void SeekFrameAdvance()
@@ -3039,7 +3040,7 @@ namespace BizHawk.Client.EmuHawk
 				}
 			}
 
-			if (oldFrameAdvanceCondition || FrameInch)
+			if ((oldFrameAdvanceCondition || FrameInch) && !PressInstructionAdvance)
 			{
 				FrameInch = false;
 				_runloopFrameAdvance = true;
@@ -3074,7 +3075,7 @@ namespace BizHawk.Client.EmuHawk
 				_frameAdvanceTimestamp = 0;
 			}
 
-			if (!EmulatorPaused)
+			if (!EmulatorPaused || PressInstructionAdvance)
 			{
 				runFrame = true;
 			}
@@ -3189,6 +3190,7 @@ namespace BizHawk.Client.EmuHawk
 				InputManager.AutofireStickyXorAdapter.IncrementLoops(Emulator.CanPollInput() && Emulator.AsInputPollable().IsLagFrame);
 
 				PressFrameAdvance = false;
+				PressInstructionAdvance = false;
 
 				// Update tools, but not if we're at the end of a turbo seek. In that case, updating will happen later when the seek is ended.
 				if (!(IsTurboSeeking && Emulator.Frame == PauseOnFrame.Value))

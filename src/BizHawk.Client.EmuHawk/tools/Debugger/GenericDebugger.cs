@@ -127,7 +127,7 @@ namespace BizHawk.Client.EmuHawk
 				DisableBreakpointBox();
 			}
 
-			SeekToBox.Enabled = SeekToBtn.Enabled = CanUseMemoryCallbacks && RegisterPanel.CanGetCpuRegisters;
+			DisassemblerAnimationIntervalsMs.Enabled = SeekToBox.Enabled = SeekToBtn.Enabled = CanUseMemoryCallbacks && RegisterPanel.CanGetCpuRegisters;
 
 			if (RegisterPanel.CanGetCpuRegisters && CanDisassemble)
 			{
@@ -160,6 +160,8 @@ namespace BizHawk.Client.EmuHawk
 			{
 				toolTip1.SetToolTip(StepOverBtn, "This core does not currently implement this feature");
 			}
+
+			DisassemblerAnimationIntervalsMs.SetFromRawInt(1000);
 		}
 
 		private void DisengageDebugger()
@@ -302,6 +304,8 @@ namespace BizHawk.Client.EmuHawk
 		private void ToPCBtn_Click(object sender, EventArgs e)
 		{
 			UpdateDisassembler();
+			UpdatePC();
+			DisassemblerView.Refresh();
 		}
 
 		private void RefreshMenuItem_Click(object sender, EventArgs e)
@@ -316,12 +320,25 @@ namespace BizHawk.Client.EmuHawk
 
 
 		private bool CanAnimateFlag = false;
+		private int _disassemblerAnimationIntervalMs = 10;
+
+		public int AnimationSleepIntervals { 
+			get
+			{
+				return _disassemblerAnimationIntervalMs;
+			}
+			set
+			{
+				_disassemblerAnimationIntervalMs = value;
+			}
+		}
 
 		private void Animate_Click(object sender, EventArgs e)
 		{
 			if (!MainForm.EmulatorPaused)
 				MainForm.PauseEmulator();
 
+			AnimationSleepIntervals = (int) (DisassemblerAnimationIntervalsMs.ToRawInt() ?? 0);
 			CanAnimateFlag = !CanAnimateFlag;
 			if (CanAnimateFlag)
 			{
@@ -355,7 +372,7 @@ namespace BizHawk.Client.EmuHawk
 			while (CanAnimateFlag)
 			{
 				e.MoveNext();
-				Thread.Sleep(10);
+				Thread.Sleep(AnimationSleepIntervals);
 				e = Coroutine().GetEnumerator();
 			}
 		}
@@ -372,13 +389,19 @@ namespace BizHawk.Client.EmuHawk
 			MainForm.InstructionAdvance();
 
 			_pcRegisterSize = Debuggable.GetCpuFlagsAndRegisters()[Disassembler.PCRegisterName].BitSize / 4;
-			SetDisassemblerItemCount();
+
 			FullUpdate();
 
-			BreakPointControl1.RemoveCurrentSeek();
-			BreakPointControl1.AddSeekBreakpoint(_currentDisassemblerAddress, PCRegister.BitSize);
-			BreakPointControl1.UpdateValues();
-			BreakPointControl1.RemoveCurrentSeek();
+			//BreakPointControl1.RemoveCurrentSeek();
+			//BreakPointControl1.AddSeekBreakpoint(_currentDisassemblerAddress, PCRegister.BitSize);
+			//BreakPointControl1.UpdateValues();
+			//BreakPointControl1.RemoveCurrentSeek();
+		}
+
+		private void DisassemblerAnimationIntervalsMs_TextChanged(object sender, EventArgs e)
+		{
+			// Default is 1 instruction per second.
+			AnimationSleepIntervals = DisassemblerAnimationIntervalsMs.ToRawInt() ?? 1000;
 		}
 	}
 }
