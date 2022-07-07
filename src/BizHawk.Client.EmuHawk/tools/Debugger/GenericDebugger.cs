@@ -385,7 +385,9 @@ namespace BizHawk.Client.EmuHawk
 
 		public void ThreadProc()
 		{
-			MainForm.PauseEmulator();
+			if (!MainForm.EmulatorPaused) { 
+				MainForm.PauseEmulator();
+			}
 			MainForm.InstructionAdvance();
 
 			_pcRegisterSize = Debuggable.GetCpuFlagsAndRegisters()[Disassembler.PCRegisterName].BitSize / 4;
