@@ -390,8 +390,7 @@ namespace BizHawk.Client.EmuHawk
 			}
 			MainForm.InstructionAdvance();
 
-			_pcRegisterSize = Debuggable.GetCpuFlagsAndRegisters()[Disassembler.PCRegisterName].BitSize / 4;
-
+			//_pcRegisterSize = Debuggable.GetCpuFlagsAndRegisters()[Disassembler.PCRegisterName].BitSize / 4;
 			FullUpdate();
 
 			//BreakPointControl1.RemoveCurrentSeek();
