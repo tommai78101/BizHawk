@@ -322,7 +322,8 @@ namespace BizHawk.Client.EmuHawk
 		private bool CanAnimateFlag = false;
 		private int _disassemblerAnimationIntervalMs = 10;
 
-		public int AnimationSleepIntervals { 
+		public int AnimationSleepIntervals
+		{
 			get
 			{
 				return _disassemblerAnimationIntervalMs;
@@ -371,9 +372,17 @@ namespace BizHawk.Client.EmuHawk
 			var e = Coroutine().GetEnumerator();
 			while (CanAnimateFlag)
 			{
-				e.MoveNext();
-				Thread.Sleep(AnimationSleepIntervals);
-				e = Coroutine().GetEnumerator();
+				if (AnimationSleepIntervals > 0)
+				{
+					e.MoveNext();
+					Thread.Sleep(AnimationSleepIntervals);
+					e = Coroutine().GetEnumerator();
+				}
+				else
+				{
+					// Temporarily let the TAStudio take control over the instruction animations.
+					Thread.Sleep(1000);
+				}
 			}
 		}
 
@@ -385,7 +394,8 @@ namespace BizHawk.Client.EmuHawk
 
 		public void ThreadProc()
 		{
-			if (!MainForm.EmulatorPaused) { 
+			if (!MainForm.EmulatorPaused)
+			{
 				MainForm.PauseEmulator();
 			}
 			MainForm.InstructionAdvance();
