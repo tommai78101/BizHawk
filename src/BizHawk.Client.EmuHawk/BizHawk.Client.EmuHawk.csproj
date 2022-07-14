@@ -307,6 +307,9 @@
 		<Compile Update="tools/BasicBot/BotControlsRow.cs" SubType="UserControl" />
 		<Compile Update="tools/BasicBot/BotControlsRow.Designer.cs" DependentUpon="BotControlsRow.cs" />
 		<EmbeddedResource Update="tools/BasicBot/BotControlsRow.resx" DependentUpon="BotControlsRow.cs" />
+		<Compile Update="tools/NeuralNetworkBot/NeuralNetworkBot.cs" />
+		<Compile Update="tools/NeuralNetworkBot/NeuralNetworkBot.Designer.cs" DependentUpon="NeuralNetworkBot.cs" />
+		<EmbeddedResource Update="tools/NeuralNetworkBot/NeuralNetworkBot.resx" DependentUpon="NeuralNetworkBot.cs" />
 		<Compile Update="tools/BatchRun.cs" SubType="Form" />
 		<Compile Update="tools/BatchRun.Designer.cs" DependentUpon="BatchRun.cs" />
 		<EmbeddedResource Update="tools/BatchRun.resx" DependentUpon="BatchRun.cs" />

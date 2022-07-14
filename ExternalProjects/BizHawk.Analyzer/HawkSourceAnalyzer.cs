@@ -10,6 +10,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class HawkSourceAnalyzer : DiagnosticAnalyzer
 {
+	private const string ERR_MSG_SWITCH_THROWS_UNKNOWN = "Indeterminable exception type in default switch branch, should be InvalidOperationException/SwitchExpressionException";
+
+	private const string ERR_MSG_SWITCH_THROWS_WRONG_TYPE = "Incorrect exception type in default switch branch, should be InvalidOperationException/SwitchExpressionException";
+
 	private static readonly DiagnosticDescriptor DiagInterpStringIsDollarAt = new(
 		id: "BHI1004",
 		title: "Verbatim interpolated strings should begin $@, not @$",
@@ -42,19 +46,35 @@ public class HawkSourceAnalyzer : DiagnosticAnalyzer
 		defaultSeverity: DiagnosticSeverity.Error,
 		isEnabledByDefault: true);
 
+	private static readonly DiagnosticDescriptor DiagSwitchShouldThrowIOE = new(
+		id: "BHI1005",
+		title: "Default branch of switch expression should throw InvalidOperationException/SwitchExpressionException or not throw",
+		messageFormat: "{0}",
+		category: "Usage",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
 		DiagInterpStringIsDollarAt,
 		DiagNoAnonClasses,
 		DiagNoAnonDelegates,
-		DiagNoQueryExpression);
+		DiagNoQueryExpression,
+		DiagSwitchShouldThrowIOE);
 
 	public override void Initialize(AnalysisContext context)
 	{
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
+		INamedTypeSymbol? invalidOperationExceptionSym = null;
+		INamedTypeSymbol? switchExpressionExceptionSym = null;
 		context.RegisterSyntaxNodeAction(
-			static snac =>
+			snac =>
 			{
+				if (invalidOperationExceptionSym is null)
+				{
+					invalidOperationExceptionSym = snac.Compilation.GetTypeByMetadataName("System.InvalidOperationException")!;
+					switchExpressionExceptionSym = snac.Compilation.GetTypeByMetadataName("System.Runtime.CompilerServices.SwitchExpressionException");
+				}
 				switch (snac.Node)
 				{
 					case AnonymousMethodExpressionSyntax:
@@ -69,11 +89,30 @@ public class HawkSourceAnalyzer : DiagnosticAnalyzer
 					case QueryExpressionSyntax:
 						snac.ReportDiagnostic(Diagnostic.Create(DiagNoQueryExpression, snac.Node.GetLocation()));
 						break;
+					case SwitchExpressionArmSyntax { WhenClause: null, Pattern: DiscardPatternSyntax, Expression: ThrowExpressionSyntax tes }:
+						var thrownExceptionType = snac.SemanticModel.GetThrownExceptionType(tes);
+						if (thrownExceptionType is null)
+						{
+							snac.ReportDiagnostic(Diagnostic.Create(
+								DiagSwitchShouldThrowIOE,
+								tes.GetLocation(),
+								DiagnosticSeverity.Warning,
+								additionalLocations: null,
+								properties: null,
+								ERR_MSG_SWITCH_THROWS_UNKNOWN));
+						}
+						else if (!invalidOperationExceptionSym.Matches(thrownExceptionType) && switchExpressionExceptionSym?.Matches(thrownExceptionType) != true)
+						{
+							snac.ReportDiagnostic(Diagnostic.Create(DiagSwitchShouldThrowIOE, tes.GetLocation(), ERR_MSG_SWITCH_THROWS_WRONG_TYPE));
+						}
+						// else correct usage, do not flag
+						break;
 				}
 			},
 			SyntaxKind.AnonymousObjectCreationExpression,
 			SyntaxKind.AnonymousMethodExpression,
 			SyntaxKind.InterpolatedStringExpression,
-			SyntaxKind.QueryExpression);
+			SyntaxKind.QueryExpression,
+			SyntaxKind.SwitchExpressionArm);
 	}
 }

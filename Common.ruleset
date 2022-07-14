@@ -12,6 +12,12 @@
 
 		<!-- Verbatim interpolated strings should begin $@, not @$ -->
 		<Rule Id="BHI1004" Action="Error" />
+
+		<!-- Default branch of switch expression should throw InvalidOperationException/SwitchExpressionException or not throw -->
+		<Rule Id="BHI1005" Action="Error" />
+
+		<!-- Throw NotImplementedException from methods/props marked [FeatureNotImplemented] -->
+		<Rule Id="BHI3300" Action="Error" />
 	</Rules>
 	<Rules AnalyzerId="DocumentationAnalyzers" RuleNamespace="DocumentationAnalyzers.StyleRules">
 		<!-- Place text in paragraphs -->
@@ -90,6 +96,9 @@
 
 		<!-- Use UTC time -->
 		<Rule Id="MEN013" Action="Hidden" />
+
+		<!-- Prefer TryGetValue -->
+		<Rule Id="MEN014" Action="Hidden" />
 	</Rules>
 	<Rules AnalyzerId="Meziantou.Analyzers" RuleNamespace="Meziantou.Analyzers">
 		<!-- StringComparison is missing -->
@@ -147,7 +156,7 @@
 		<Rule Id="MA0018" Action="Error" />
 
 		<!-- Use EventArgs.Empty -->
-		<Rule Id="MA0019" Action="Hidden" />
+		<Rule Id="MA0019" Action="Error" />
 
 		<!-- Use direct methods instead of LINQ methods -->
 		<Rule Id="MA0020" Action="Hidden" />

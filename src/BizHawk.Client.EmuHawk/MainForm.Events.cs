@@ -1202,6 +1202,7 @@ namespace BizHawk.Client.EmuHawk
 			BatchRunnerMenuItem.Visible = VersionInfo.DeveloperBuild;
 
 			BasicBotMenuItem.Enabled = Tools.IsAvailable<BasicBot>();
+			NeuralNetworkBotMenuItem.Enabled = Tools.IsAvailable<NeuralNetworkBot>();
 
 			GameSharkConverterMenuItem.Enabled = Tools.IsAvailable<GameShark>();
 			MacroToolMenuItem.Enabled = MovieSession.Movie.IsActive() && Tools.IsAvailable<MacroInputTool>();
@@ -1301,6 +1302,11 @@ namespace BizHawk.Client.EmuHawk
 		private void BasicBotMenuItem_Click(object sender, EventArgs e)
 		{
 			Tools.Load<BasicBot>();
+		}
+
+		private void NeuralNetworkBotMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Load<NeuralNetworkBot>();
 		}
 
 		private void CheatsMenuItem_Click(object sender, EventArgs e)

@@ -263,6 +263,7 @@ namespace BizHawk.Client.EmuHawk
 			CodeDataLoggerMenuItem.Image = Properties.Resources.CdLogger;
 			VirtualPadMenuItem.Image = Properties.Resources.GameController;
 			BasicBotMenuItem.Image = Properties.Resources.BasicBotBit;
+			NeuralNetworkBotMenuItem.Image = Properties.Resources.BasicBotBit;
 			CheatsMenuItem.Image = Properties.Resources.Freeze;
 			GameSharkConverterMenuItem.Image = Properties.Resources.Shark;
 			MultiDiskBundlerFileMenuItem.Image = Properties.Resources.SaveConfig;

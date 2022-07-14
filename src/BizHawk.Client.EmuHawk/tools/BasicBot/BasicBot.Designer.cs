@@ -308,8 +308,9 @@ namespace BizHawk.Client.EmuHawk
 			// 
 			// BestGroupBox
 			// 
-			this.BestGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+			this.BestGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.BestGroupBox.Controls.Add(this.btnCopyBestInput);
 			this.BestGroupBox.Controls.Add(this.PlayBestButton);
 			this.BestGroupBox.Controls.Add(this.ClearBestButton);
@@ -464,7 +465,7 @@ namespace BizHawk.Client.EmuHawk
 			// label13
 			// 
 			this.label13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label13.Location = new System.Drawing.Point(104, 16);
+			this.label13.Location = new System.Drawing.Point(96, 16);
 			this.label13.Name = "label13";
 			this.label13.Text = "Main Value:";
 			// 
@@ -606,7 +607,8 @@ namespace BizHawk.Client.EmuHawk
 			">=",
 			"=",
 			"<=",
-			"<"});
+			"<",
+			"!="});
 			this.MainOperator.Location = new System.Drawing.Point(208, 3);
 			this.MainOperator.Name = "MainOperator";
 			this.MainOperator.Size = new System.Drawing.Size(40, 21);
@@ -689,7 +691,8 @@ namespace BizHawk.Client.EmuHawk
 			">=",
 			"=",
 			"<=",
-			"<"});
+			"<",
+			"!="});
 			this.Tiebreak1Operator.Location = new System.Drawing.Point(208, 3);
 			this.Tiebreak1Operator.Name = "Tiebreak1Operator";
 			this.Tiebreak1Operator.Size = new System.Drawing.Size(40, 21);
@@ -773,7 +776,8 @@ namespace BizHawk.Client.EmuHawk
 			">=",
 			"=",
 			"<=",
-			"<"});
+			"<",
+			"!="});
 			this.Tiebreak2Operator.Location = new System.Drawing.Point(208, 3);
 			this.Tiebreak2Operator.Name = "Tiebreak2Operator";
 			this.Tiebreak2Operator.Size = new System.Drawing.Size(40, 21);
@@ -915,7 +919,8 @@ namespace BizHawk.Client.EmuHawk
 			">=",
 			"=",
 			"<=",
-			"<"});
+			"<",
+			"!="});
 			this.Tiebreak3Operator.Location = new System.Drawing.Point(208, 3);
 			this.Tiebreak3Operator.Name = "Tiebreak3Operator";
 			this.Tiebreak3Operator.Size = new System.Drawing.Size(40, 21);
@@ -961,7 +966,8 @@ namespace BizHawk.Client.EmuHawk
 			// 
 			// ControlGroupBox
 			// 
-			this.ControlGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.ControlGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ControlGroupBox.Controls.Add(this.InvisibleEmulationCheckBox);
 			this.ControlGroupBox.Controls.Add(this.panel2);
 			this.ControlGroupBox.Controls.Add(this.StopBtn);
@@ -1075,7 +1081,7 @@ namespace BizHawk.Client.EmuHawk
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx RecentSubMenu;
 		private System.Windows.Forms.StatusStrip BotStatusStrip;
 		private System.Windows.Forms.GroupBox ControlsBox;
-		private System.Windows.Forms.Panel ControlProbabilityPanel;
+		protected System.Windows.Forms.Panel ControlProbabilityPanel;
 		private System.Windows.Forms.GroupBox BestGroupBox;
 		private BizHawk.WinForms.Controls.LocLabelEx label1;
 		private BizHawk.WinForms.Controls.LocLabelEx label2;
@@ -1092,27 +1098,27 @@ namespace BizHawk.Client.EmuHawk
 		private BizHawk.WinForms.Controls.LocLabelEx label3;
 		private System.Windows.Forms.Button StopBtn;
 		private BizHawk.WinForms.Controls.LocLabelEx label8;
-		private System.Windows.Forms.ComboBox StartFromSlotBox;
+		protected System.Windows.Forms.ComboBox StartFromSlotBox;
 		private BizHawk.WinForms.Controls.LocLabelEx label11;
 		private BizHawk.WinForms.Controls.LocLabelEx label10;
-		private System.Windows.Forms.TextBox BestTieBreak3Box;
-		private System.Windows.Forms.TextBox BestTieBreak2Box;
-		private System.Windows.Forms.TextBox BestTieBreak1Box;
-		private System.Windows.Forms.TextBox BestMaximizeBox;
+		protected System.Windows.Forms.TextBox BestTieBreak3Box;
+		protected System.Windows.Forms.TextBox BestTieBreak2Box;
+		protected System.Windows.Forms.TextBox BestTieBreak1Box;
+		protected System.Windows.Forms.TextBox BestMaximizeBox;
 		private BizHawk.WinForms.Controls.LocLabelEx label16;
 		private BizHawk.WinForms.Controls.LocLabelEx label15;
 		private BizHawk.WinForms.Controls.LocLabelEx label14;
 		private BizHawk.WinForms.Controls.LocLabelEx label13;
 		private System.Windows.Forms.Panel panel1;
-		private BizHawk.WinForms.Controls.LocLabelEx BestAttemptNumberLabel;
+		protected BizHawk.WinForms.Controls.LocLabelEx BestAttemptNumberLabel;
 		private BizHawk.WinForms.Controls.LocLabelEx label17;
-		private BizHawk.WinForms.Controls.LocLabelEx BestAttemptLogLabel;
-		private System.Windows.Forms.Button ClearBestButton;
+		protected BizHawk.WinForms.Controls.LocLabelEx BestAttemptLogLabel;
+		protected System.Windows.Forms.Button ClearBestButton;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx SaveAsMenuItem;
 		private BizHawk.WinForms.Controls.ToolStripSeparatorEx toolStripSeparator2;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx NewMenuItem;
-		private System.Windows.Forms.Button PlayBestButton;
-		private System.Windows.Forms.ToolStripStatusLabel MessageLabel;
+		protected System.Windows.Forms.Button PlayBestButton;
+		protected System.Windows.Forms.ToolStripStatusLabel MessageLabel;
 		private System.Windows.Forms.GroupBox ControlGroupBox;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx TurboWhileBottingMenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx MemoryDomainsMenuItem;
@@ -1127,29 +1133,29 @@ namespace BizHawk.Client.EmuHawk
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx _1ByteMenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx _2ByteMenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx _4ByteMenuItem;
-        private System.Windows.Forms.ComboBox Tiebreak2Operator;
-        private System.Windows.Forms.ComboBox Tiebreak1Operator;
+		protected System.Windows.Forms.ComboBox Tiebreak2Operator;
+		protected System.Windows.Forms.ComboBox Tiebreak1Operator;
 		private System.Windows.Forms.Panel panel6;
-		private System.Windows.Forms.ComboBox Tiebreak3Operator;
+		protected System.Windows.Forms.ComboBox Tiebreak3Operator;
 		private BizHawk.WinForms.Controls.LocLabelEx label12;
 		private BizHawk.WinForms.Controls.LocLabelEx label7;
 		private HexTextBox TieBreaker3Box;
-		private System.Windows.Forms.NumericUpDown TieBreak3Numeric;
-		private System.Windows.Forms.RadioButton TieBreak3ValueRadio;
-		private System.Windows.Forms.RadioButton TieBreak3BestRadio;
+		protected System.Windows.Forms.NumericUpDown TieBreak3Numeric;
+		protected System.Windows.Forms.RadioButton TieBreak3ValueRadio;
+		protected System.Windows.Forms.RadioButton TieBreak3BestRadio;
 		private System.Windows.Forms.Panel panel5;
-		private System.Windows.Forms.NumericUpDown TieBreak2Numeric;
-		private System.Windows.Forms.RadioButton TieBreak2ValueRadio;
-		private System.Windows.Forms.RadioButton TieBreak2BestRadio;
+		protected System.Windows.Forms.NumericUpDown TieBreak2Numeric;
+		protected System.Windows.Forms.RadioButton TieBreak2ValueRadio;
+		protected System.Windows.Forms.RadioButton TieBreak2BestRadio;
 		private System.Windows.Forms.Panel panel4;
-		private System.Windows.Forms.NumericUpDown TieBreak1Numeric;
-		private System.Windows.Forms.RadioButton TieBreak1ValueRadio;
-		private System.Windows.Forms.RadioButton TieBreak1BestRadio;
+		protected System.Windows.Forms.NumericUpDown TieBreak1Numeric;
+		protected System.Windows.Forms.RadioButton TieBreak1ValueRadio;
+		protected System.Windows.Forms.RadioButton TieBreak1BestRadio;
 		private System.Windows.Forms.Panel panel3;
-		private System.Windows.Forms.NumericUpDown MainValueNumeric;
-		private System.Windows.Forms.RadioButton MainValueRadio;
-		private System.Windows.Forms.RadioButton MainBestRadio;
-		private System.Windows.Forms.ComboBox MainOperator;
+		protected System.Windows.Forms.NumericUpDown MainValueNumeric;
+		protected System.Windows.Forms.RadioButton MainValueRadio;
+		protected System.Windows.Forms.RadioButton MainBestRadio;
+		protected System.Windows.Forms.ComboBox MainOperator;
 		private BizHawk.WinForms.Controls.LocLabelEx label9;
 		private HexTextBox MaximizeAddressBox;
 		private BizHawk.WinForms.Controls.LocLabelEx maximizeLabeltext;
