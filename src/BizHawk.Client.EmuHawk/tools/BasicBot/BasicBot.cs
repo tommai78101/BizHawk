@@ -33,16 +33,16 @@ namespace BizHawk.Client.EmuHawk
 
 		}
 
-		protected bool _isBotting;
-		protected long _attempts = 1;
-		protected long _frames;
-		protected int _targetFrame;
+		public bool _isBotting;
+		public long _attempts = 1;
+		public long _frames;
+		public int _targetFrame;
 		protected bool _oldCountingSetting;
-		protected BotAttempt _currentBotAttempt;
-		protected BotAttempt _bestBotAttempt;
-		protected readonly BotAttempt _comparisonBotAttempt;
+		public BotAttempt _currentBotAttempt;
+		public BotAttempt _bestBotAttempt;
+		public readonly BotAttempt _comparisonBotAttempt;
 		protected bool _replayMode;
-		protected int _startFrame;
+		public int _startFrame;
 		protected string _lastRom = "";
 		protected int _lastFrameAdvanced;
 
@@ -187,7 +187,7 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		protected int FrameLength
+		public int FrameLength
 		{
 			get => (int)FrameLengthNumeric.Value;
 			set => FrameLengthNumeric.Value = value;
@@ -870,7 +870,7 @@ namespace BizHawk.Client.EmuHawk
 			MessageLabel.Text = "Replay stopped";
 		}
 
-		protected virtual bool IsBetter(BotAttempt comparison, BotAttempt current)
+		public virtual bool IsBetter(BotAttempt comparison, BotAttempt current)
 		{
 			if (!TestValue(MainComparisonType, current.Maximize, comparison.Maximize))
 			{

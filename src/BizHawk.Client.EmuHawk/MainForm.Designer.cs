@@ -205,7 +205,7 @@ namespace BizHawk.Client.EmuHawk
 			this.MacroToolMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
 			this.VirtualPadMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
 			this.BasicBotMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
-			this.NeuralNetworkBotMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
+			this.GeneticAlgorithmBotMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
 			this.toolStripSeparator11 = new BizHawk.WinForms.Controls.ToolStripSeparatorEx();
 			this.CheatsMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
 			this.GameSharkConverterMenuItem = new BizHawk.WinForms.Controls.ToolStripMenuItemEx();
@@ -1356,7 +1356,7 @@ namespace BizHawk.Client.EmuHawk
             this.MacroToolMenuItem,
             this.VirtualPadMenuItem,
             this.BasicBotMenuItem,
-            this.NeuralNetworkBotMenuItem,
+            this.GeneticAlgorithmBotMenuItem,
             this.toolStripSeparator11,
             this.CheatsMenuItem,
             this.GameSharkConverterMenuItem,
@@ -1427,10 +1427,10 @@ namespace BizHawk.Client.EmuHawk
 			this.BasicBotMenuItem.Text = "Basic Bot";
 			this.BasicBotMenuItem.Click += new System.EventHandler(this.BasicBotMenuItem_Click);
 			// 
-			// neuralNetworkBotMenuItem
+			// GeneticAlgorithmBotMenuItem
 			// 
-			this.NeuralNetworkBotMenuItem.Text = "Neural Network Bot";
-			this.NeuralNetworkBotMenuItem.Click += new System.EventHandler(this.NeuralNetworkBotMenuItem_Click);
+			this.GeneticAlgorithmBotMenuItem.Text = "Genetic Algorithm Bot";
+			this.GeneticAlgorithmBotMenuItem.Click += new System.EventHandler(this.GeneticAlgorithmBotMenuItem_Click);
 			// 
 			// CheatsMenuItem
 			// 
@@ -2717,7 +2717,7 @@ namespace BizHawk.Client.EmuHawk
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx Frameskip8MenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx Speed400MenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx BasicBotMenuItem;
-		private BizHawk.WinForms.Controls.ToolStripMenuItemEx NeuralNetworkBotMenuItem;
+		private BizHawk.WinForms.Controls.ToolStripMenuItemEx GeneticAlgorithmBotMenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx DisplayMessagesMenuItem;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx C64SubMenu;
 		private BizHawk.WinForms.Controls.ToolStripMenuItemEx C64SettingsMenuItem;
