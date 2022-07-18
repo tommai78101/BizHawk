@@ -870,7 +870,7 @@ namespace BizHawk.Client.EmuHawk
 			MessageLabel.Text = "Replay stopped";
 		}
 
-		private bool IsBetter(BotAttempt comparison, BotAttempt current)
+		public virtual bool IsBetter(BotAttempt comparison, BotAttempt current)
 		{
 			static bool TestValue(byte operation, int currentValue, int bestValue)
 				=> operation switch
