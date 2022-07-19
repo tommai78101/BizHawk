@@ -55,6 +55,8 @@ namespace BizHawk.Client.EmuHawk
 		private GeneticAlgorithm ga;
 		private InputFitnessEvaluator fitnessManager;
 		private bool isRunning = false;
+		private bool generationIsReady = false;
+		private int _gaNumberOfGenerations { get; set; }
 
 		private byte _mainComparisonType { get; set; }
 		private byte _tieBreaker1ComparisonType { get; set; }
@@ -81,6 +83,7 @@ namespace BizHawk.Client.EmuHawk
 			_tieBreaker2ComparisonType = Tie2ComparisonType;
 			_tieBreaker3ComparisonType = Tie3ComparisonType;
 
+			_gaNumberOfGenerations = 0;
 			this.fitnessManager = new InputFitnessEvaluator(this);
 			InputRecording adamChromosome = new InputRecording(this, _startFrame, FrameLength);
 			adamChromosome.SetBeforeAttempt(MaximizeValue, TieBreaker1Value, TieBreaker2Value, TieBreaker3Value);
@@ -92,7 +95,7 @@ namespace BizHawk.Client.EmuHawk
 			var selection = new RouletteWheelSelection();
 			var population = new Population(4, 4, adamChromosome);
 			this.ga = new GeneticAlgorithm(population, this.fitnessManager, selection, crossover, mutation);
-			this.ga.Termination = new GenerationNumberTermination((int) (this.Attempts + 1));
+			this.ga.Termination = new GenerationNumberTermination(this._gaNumberOfGenerations + 1);
 			this.ga.GenerationRan += (sender, e) =>
 			{
 				if (this._bestBotAttempt.is_Reset || IsBetter(this._bestBotAttempt, this._gaBestAttempt))
@@ -102,6 +105,12 @@ namespace BizHawk.Client.EmuHawk
 					Console.WriteLine($"Found best attempt!");
 				}
 				Console.WriteLine($"Generation: {this.ga.GenerationsNumber}\t\t{MaximizeValue}");
+
+				if (!this.generationIsReady)
+				{
+					this._gaNumberOfGenerations++;
+					this.generationIsReady = true;
+				}
 			};
 
 			base.StartBot();
@@ -184,10 +193,10 @@ namespace BizHawk.Client.EmuHawk
 					_lastFrameAdvanced = Emulator.Frame;
 					_doNotUpdateValues = false;
 
-					// Genetic Algorithm update here
-					if (!this.ga.IsRunning)
+					if (this.isRunning)
 					{
-						this.ga.Termination = new GenerationNumberTermination((int) (Attempts + 1));
+						this.generationIsReady = false;
+						this.ga.Termination = new GenerationNumberTermination(this._gaNumberOfGenerations + 1);
 						this.ga.Resume();
 					}
 
@@ -242,68 +251,22 @@ namespace BizHawk.Client.EmuHawk
 
 		public double GetBetterValue(BotAttempt comparison, BotAttempt current)
 		{
-			if (TestValue(_mainComparisonType, current.Maximize, comparison.Maximize))
-			{
-				return comparison.Maximize - current.Maximize;
-			}
-
-			if (current.Maximize == comparison.Maximize)
-			{
-				if (TestValue(_tieBreaker1ComparisonType, current.TieBreak1, comparison.TieBreak1))
+			static bool TestValue(byte operation, int currentValue, int bestValue)
+				=> operation switch
 				{
-					return comparison.TieBreak1 - current.TieBreak1;
-				}
+					0 => (currentValue > bestValue),
+					1 => (currentValue >= bestValue),
+					2 => (currentValue == bestValue),
+					3 => (currentValue <= bestValue),
+					4 => (currentValue < bestValue),
+					5 => (currentValue != bestValue),
+					_ => false
+				};
 
-				if (current.TieBreak1 == comparison.TieBreak1)
-				{
-					if (TestValue(_tieBreaker2ComparisonType, current.TieBreak2, comparison.TieBreak2))
-					{
-						return comparison.TieBreak2 - current.TieBreak2;
-					}
-
-					if (current.TieBreak2 == comparison.TieBreak2)
-					{
-						if (TestValue(_tieBreaker3ComparisonType, current.TieBreak3, comparison.TieBreak3))
-						{
-							return comparison.TieBreak3 - current.TieBreak3;
-						}
-					}
-				}
-			}
-			return 0.0;
-		}
-
-		public override bool IsBetter(BotAttempt comparison, BotAttempt current)
-		{
-			if (!TestValue(_mainComparisonType, current.Maximize, comparison.Maximize))
-			{
-				return false;
-			}
-
-			if (current.Maximize == comparison.Maximize)
-			{
-				if (!TestValue(_tieBreaker1ComparisonType, current.TieBreak1, comparison.TieBreak1))
-				{
-					return false;
-				}
-
-				if (current.TieBreak1 == comparison.TieBreak1)
-				{
-					if (!TestValue(_tieBreaker2ComparisonType, current.TieBreak2, comparison.TieBreak2))
-					{
-						return false;
-					}
-
-					if (current.TieBreak2 == comparison.TieBreak2)
-					{
-						if (!TestValue(_tieBreaker3ComparisonType, current.TieBreak3, comparison.TieBreak3))
-						{
-							return false;
-						}
-					}
-				}
-			}
-			return true;
+			if (TestValue(MainComparisonType, current.Maximize, comparison.Maximize)) return comparison.Maximize - current.Maximize;
+			if (TestValue(Tie1ComparisonType, current.TieBreak1, comparison.TieBreak1)) return comparison.TieBreak1 - current.TieBreak1;
+			if (TestValue(Tie2ComparisonType, current.TieBreak2, comparison.TieBreak2)) return comparison.TieBreak2 - current.TieBreak2;
+			return comparison.TieBreak3 - current.TieBreak3;
 		}
 
 		protected override void copy_curent_to_best()
