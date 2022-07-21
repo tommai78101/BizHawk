@@ -75,7 +75,7 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (!typeof(IToolForm).IsAssignableFrom(toolType))
 			{
-				throw new ArgumentException($"Type {toolType.Name} does not implement {nameof(IToolForm)}.");
+				throw new ArgumentException(message: $"Type {toolType.Name} does not implement {nameof(IToolForm)}.", paramName: nameof(toolType));
 			}
 			var mi = typeof(ToolManager).GetMethod(nameof(Load), new[] { typeof(bool), typeof(string) })!.MakeGenericMethod(toolType);
 			return (IToolForm) mi.Invoke(this, new object[] { focus, "" });
@@ -131,7 +131,7 @@ namespace BizHawk.Client.EmuHawk
 			if (newTool is Form form) form.Owner = _owner;
 			ServiceInjector.UpdateServices(_emulator.ServiceProvider, newTool);
 			SetBaseProperties(newTool);
-			var toolTypeName = typeof(T).ToString();
+			var toolTypeName = typeof(T).FullName!;
 			// auto settings
 			if (newTool is IToolFormAutoConfig autoConfigTool)
 			{
@@ -314,7 +314,7 @@ namespace BizHawk.Client.EmuHawk
 
 			if (dest == null)
 			{
-				throw new InvalidOperationException($"{nameof(IToolFormAutoConfig)} must have menu to bind to!");
+				throw new InvalidOperationException($"{nameof(IToolFormAutoConfig)} must have menu to bind to! (need {nameof(Form.MainMenuStrip)} or other {nameof(MenuStrip)} w/ menu labelled \"Settings\")");
 			}
 
 			int idx = dest.Count;
@@ -455,21 +455,10 @@ namespace BizHawk.Client.EmuHawk
 		/// </summary>
 		/// <typeparam name="T">Type of tool to check</typeparam>
 		public bool IsLoaded<T>() where T : IToolForm
-		{
-			var existingTool = _tools.FirstOrDefault(t => t is T);
-			if (existingTool != null)
-			{
-				return existingTool.IsActive;
-			}
-
-			return false;
-		}
+			=> _tools.OfType<T>().FirstOrDefault()?.IsActive is true;
 
 		public bool IsLoaded(Type toolType)
-		{
-			var existingTool = _tools.FirstOrDefault(t => t.GetType() == toolType);
-			return existingTool != null && existingTool.IsActive;
-		}
+			=> _tools.Find(t => t.GetType() == toolType)?.IsActive is true;
 
 		public bool IsOnScreen(Point topLeft)
 		{
@@ -501,9 +490,7 @@ namespace BizHawk.Client.EmuHawk
 		}
 
 		public IEnumerable<Type> AvailableTools => EmuHawk.ReflectionCache.Types
-			.Where(t => typeof(IToolForm).IsAssignableFrom(t))
-			.Where(t => !t.IsInterface)
-			.Where(IsAvailable);
+			.Where(t => !t.IsInterface && typeof(IToolForm).IsAssignableFrom(t) && IsAvailable(t));
 
 		/// <summary>
 		/// Calls UpdateValues() on an instance of T, if it exists
@@ -511,8 +498,8 @@ namespace BizHawk.Client.EmuHawk
 		/// <typeparam name="T">Type of tool to update</typeparam>
 		public void UpdateValues<T>() where T : IToolForm
 		{
-			var tool = _tools.FirstOrDefault(t => t is T);
-			if (tool != null && tool.IsActive)
+			var tool = _tools.OfType<T>().FirstOrDefault();
+			if (tool?.IsActive is true)
 			{
 				tool.UpdateValues(ToolFormUpdateType.General);
 			}
@@ -568,10 +555,7 @@ namespace BizHawk.Client.EmuHawk
 		/// </summary>
 		/// <typeparam name="T">Type of tool to restart</typeparam>
 		public void Restart<T>() where T : IToolForm
-		{
-			var tool = _tools.FirstOrDefault(t => t is T);
-			tool?.Restart();
-		}
+			=> _tools.OfType<T>().FirstOrDefault()?.Restart();
 
 		/// <summary>
 		/// Runs AskSave on every tool dialog, false is returned if any tool returns false
@@ -594,7 +578,7 @@ namespace BizHawk.Client.EmuHawk
 		/// <typeparam name="T">Type of tool to close</typeparam>
 		public void Close<T>() where T : IToolForm
 		{
-			var tool = _tools.FirstOrDefault(t => t is T);
+			var tool = _tools.OfType<T>().FirstOrDefault();
 			if (tool != null)
 			{
 				tool.Close();
@@ -604,8 +588,7 @@ namespace BizHawk.Client.EmuHawk
 
 		public void Close(Type toolType)
 		{
-			var tool = _tools.FirstOrDefault(toolType.IsInstanceOfType);
-
+			var tool = _tools.Find(toolType.IsInstanceOfType);
 			if (tool != null)
 			{
 				tool.Close();

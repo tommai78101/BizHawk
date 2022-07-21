@@ -16,6 +16,18 @@
 		<!-- Default branch of switch expression should throw InvalidOperationException/SwitchExpressionException or not throw -->
 		<Rule Id="BHI1005" Action="Error" />
 
+		<!-- Don't call this.GetType() in sealed type, use typeof operator -->
+		<Rule Id="BHI1100" Action="Error" />
+
+		<!-- Don't call this.GetType(), use typeof operator (or replace subtype check with better encapsulation) -->
+		<Rule Id="BHI1101" Action="Error" />
+
+		<!-- Don't call typeof(T).Name, use nameof operator -->
+		<Rule Id="BHI1102" Action="Error" />
+
+		<!-- Don't call typeof(T).ToString(), use nameof operator or typeof(T).FullName -->
+		<Rule Id="BHI1103" Action="Error" />
+
 		<!-- Throw NotImplementedException from methods/props marked [FeatureNotImplemented] -->
 		<Rule Id="BHI3300" Action="Error" />
 	</Rules>
@@ -99,6 +111,9 @@
 
 		<!-- Prefer TryGetValue -->
 		<Rule Id="MEN014" Action="Hidden" />
+
+		<!-- Use Preferred Terms -->
+		<Rule Id="MEN015" Action="Hidden" />
 	</Rules>
 	<Rules AnalyzerId="Meziantou.Analyzers" RuleNamespace="Meziantou.Analyzers">
 		<!-- StringComparison is missing -->
@@ -135,16 +150,16 @@
 		<Rule Id="MA0011" Action="Hidden" />
 
 		<!-- Do not raise reserved exception type -->
-		<Rule Id="MA0012" Action="Hidden" />
+		<Rule Id="MA0012" Action="Error" />
 
 		<!-- Types should not extend System.ApplicationException -->
 		<Rule Id="MA0013" Action="Error" />
 
 		<!-- Do not raise System.ApplicationException type -->
-		<Rule Id="MA0014" Action="Hidden" />
+		<Rule Id="MA0014" Action="Error" />
 
 		<!-- Specify the parameter name in ArgumentException -->
-		<Rule Id="MA0015" Action="Hidden" />
+		<Rule Id="MA0015" Action="Error" />
 
 		<!-- Prefer returning collection abstraction instead of implementation -->
 		<Rule Id="MA0016" Action="Hidden" />
@@ -159,7 +174,7 @@
 		<Rule Id="MA0019" Action="Error" />
 
 		<!-- Use direct methods instead of LINQ methods -->
-		<Rule Id="MA0020" Action="Hidden" />
+		<Rule Id="MA0020" Action="Error" />
 
 		<!-- Use StringComparer.GetHashCode instead of string.GetHashCode -->
 		<Rule Id="MA0021" Action="Hidden" />
@@ -186,13 +201,13 @@
 		<Rule Id="MA0028" Action="Hidden" />
 
 		<!-- Combine LINQ methods -->
-		<Rule Id="MA0029" Action="Hidden" />
+		<Rule Id="MA0029" Action="Error" />
 
 		<!-- Remove useless OrderBy call -->
 		<Rule Id="MA0030" Action="Error" />
 
 		<!-- Optimize Enumerable.Count() usage -->
-		<Rule Id="MA0031" Action="Hidden" />
+		<Rule Id="MA0031" Action="Error" />
 
 		<!-- Use an overload with a CancellationToken argument -->
 		<Rule Id="MA0032" Action="Hidden" />
@@ -225,7 +240,7 @@
 		<Rule Id="MA0042" Action="Error" />
 
 		<!-- Use nameof operator in ArgumentException -->
-		<Rule Id="MA0043" Action="Hidden" />
+		<Rule Id="MA0043" Action="Error" />
 
 		<!-- Remove useless ToString call -->
 		<Rule Id="MA0044" Action="Hidden" />
@@ -252,13 +267,13 @@
 		<Rule Id="MA0051" Action="Hidden" />
 
 		<!-- Replace constant Enum.ToString with nameof -->
-		<Rule Id="MA0052" Action="Hidden" />
+		<Rule Id="MA0052" Action="Error" />
 
 		<!-- Make class sealed -->
 		<Rule Id="MA0053" Action="Hidden" />
 
 		<!-- Embed the caught exception as innerException -->
-		<Rule Id="MA0054" Action="Hidden" />
+		<Rule Id="MA0054" Action="Error" />
 
 		<!-- Do not use finalizer -->
 		<Rule Id="MA0055" Action="Hidden" />
@@ -294,7 +309,7 @@
 		<Rule Id="MA0065" Action="Error" />
 
 		<!-- Hash table unfriendly type is used in a hash table -->
-		<Rule Id="MA0066" Action="Hidden" />
+		<Rule Id="MA0066" Action="Error" />
 
 		<!-- Use Guid.Empty -->
 		<Rule Id="MA0067" Action="Error" />
@@ -348,7 +363,7 @@
 		<Rule Id="MA0083" Action="Error" />
 
 		<!-- Local variable should not hide other symbols -->
-		<Rule Id="MA0084" Action="Hidden" />
+		<Rule Id="MA0084" Action="Warning" />
 
 		<!-- Anonymous delegates should not be used to unsubscribe from Events -->
 		<Rule Id="MA0085" Action="Error" />
@@ -390,7 +405,7 @@
 		<Rule Id="MA0097" Action="Hidden" />
 
 		<!-- Use indexer instead of LINQ methods -->
-		<Rule Id="MA0098" Action="Hidden" />
+		<Rule Id="MA0098" Action="Warning" />
 
 		<!-- Use Explicit enum value instead of 0 -->
 		<Rule Id="MA0099" Action="Hidden" />
@@ -610,7 +625,7 @@
 		<Rule Id="CA2101" Action="Hidden" />
 
 		<!-- Instantiate argument exceptions correctly -->
-		<Rule Id="CA2208" Action="Hidden" />
+		<Rule Id="CA2208" Action="Error" />
 
 		<!-- Non-constant fields should not be visible -->
 		<Rule Id="CA2211" Action="Hidden" />
