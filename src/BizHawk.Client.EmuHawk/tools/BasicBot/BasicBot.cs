@@ -917,6 +917,7 @@ namespace BizHawk.Client.EmuHawk
 				}
 				BestAttemptLogLabel.Text = sb.ToString();
 				PlayBestButton.Enabled = true;
+				btnCopyBestInput.Enabled = true;
 			}
 			else
 			{
