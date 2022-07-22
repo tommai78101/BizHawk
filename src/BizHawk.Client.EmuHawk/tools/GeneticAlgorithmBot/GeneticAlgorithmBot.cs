@@ -51,7 +51,7 @@ namespace BizHawk.Client.EmuHawk
 		public BotAttempt _bestAttempt => _bestBotAttempt;
 		public InputRecording _bestRecording => ((InputRecording) this.ga.BestChromosome);
 		public FrameInput[] _lastKnownBestBuffer { get; set; }
-		public BotAttempt _gaBestAttempt => ((InputRecording) this.ga.BestChromosome).AttemptAfter;
+		public BotAttempt _bestRecordingAttempt => ((InputRecording) this.ga.BestChromosome).AttemptAfter;
 
 		private GeneticAlgorithm ga;
 		private InputFitnessEvaluator fitnessManager;
@@ -148,7 +148,6 @@ namespace BizHawk.Client.EmuHawk
 			if (_replayMode)
 			{
 				int index = Emulator.Frame - _startFrame;
-				this._bestBotAttempt = this._gaBestAttempt;
 				if (index < _bestBotAttempt.Log.Count)
 				{
 					var logEntry = _bestBotAttempt.Log[index];
@@ -180,7 +179,7 @@ namespace BizHawk.Client.EmuHawk
 					if (this._bestBotAttempt.is_Reset || IsBetter(this._bestBotAttempt, this._bestRecording.AttemptAfter))
 					{
 						Console.WriteLine($"Found best attempt! {this.ga.GenerationsNumber}\t\t{MaximizeValue}");
-						copy_recording_to_GA();
+						copy_GA_to_best();
 						copy_recording_to_last_known_buffer();
 						UpdateBestAttemptUI();
 					}
@@ -204,11 +203,10 @@ namespace BizHawk.Client.EmuHawk
 
 				// Before this would have 2 additional hits before the frame even advanced, making the amount of inputs greater than the number of frames to test.
 				//aka do not Add more inputs than there are Frames to test
-				if (this._gaBestAttempt.Log.Count < FrameLength)
+				if (this._bestRecordingAttempt.Log.Count < FrameLength)
 				{
 					PressButtons(false);
 					_lastFrameAdvanced = Emulator.Frame;
-					copy_recording_to_GA();
 				}
 			}
 		}
@@ -224,8 +222,8 @@ namespace BizHawk.Client.EmuHawk
 				}
 				InputManager.SyncControls(Emulator, MovieSession, Config);
 
-				if (clear_log) { _gaBestAttempt.Log.Clear(); }
-				_gaBestAttempt.Log.Add(_logGenerator.GenerateLogEntry());
+				if (clear_log) { _bestRecordingAttempt.Log.Clear(); }
+				_bestRecordingAttempt.Log.Add(_logGenerator.GenerateLogEntry());
 			}
 		}
 
@@ -285,27 +283,18 @@ namespace BizHawk.Client.EmuHawk
 
 		public void copy_GA_to_best()
 		{
-			this._bestBotAttempt.Attempt = this._gaBestAttempt.Attempt;
-			this._bestBotAttempt.Maximize = this._gaBestAttempt.Maximize;
-			this._bestBotAttempt.TieBreak1 = this._gaBestAttempt.TieBreak1;
-			this._bestBotAttempt.TieBreak2 = this._gaBestAttempt.TieBreak2;
-			this._bestBotAttempt.TieBreak3 = this._gaBestAttempt.TieBreak3;
+			this._bestBotAttempt.Attempt = this._bestRecordingAttempt.Attempt;
+			this._bestBotAttempt.Maximize = this._bestRecordingAttempt.Maximize;
+			this._bestBotAttempt.TieBreak1 = this._bestRecordingAttempt.TieBreak1;
+			this._bestBotAttempt.TieBreak2 = this._bestRecordingAttempt.TieBreak2;
+			this._bestBotAttempt.TieBreak3 = this._bestRecordingAttempt.TieBreak3;
 
 			this._bestBotAttempt.Log.Clear();
-			for (int i = 0; i < this._gaBestAttempt.Log.Count; i++)
+			for (int i = 0; i < this._bestRecordingAttempt.Log.Count; i++)
 			{
-				this._bestBotAttempt.Log.Add(this._gaBestAttempt.Log[i]);
+				this._bestBotAttempt.Log.Add(this._bestRecordingAttempt.Log[i]);
 			}
 			this._bestBotAttempt.is_Reset = false;
-		}
-
-		private void copy_recording_to_GA()
-		{
-			this._gaBestAttempt.Attempt = this._bestRecording.AttemptAfter.Attempt;
-			this._gaBestAttempt.Maximize = this._bestRecording.AttemptAfter.Maximize;
-			this._gaBestAttempt.TieBreak1 = this._bestRecording.AttemptAfter.TieBreak1;
-			this._gaBestAttempt.TieBreak2 = this._bestRecording.AttemptAfter.TieBreak2;
-			this._gaBestAttempt.TieBreak3 = this._bestRecording.AttemptAfter.TieBreak3;
 		}
 
 		private void copy_recording_to_last_known_buffer()
@@ -316,6 +305,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void write_bot_attempts_to_recording()
 		{
+			this._bestRecording.AttemptAfter.Attempt = this.Attempts;
 			this._bestRecording.SetAfterAttempt(MaximizeValue, TieBreaker1Value, TieBreaker2Value, TieBreaker3Value);
 		}
 	}
@@ -342,7 +332,7 @@ namespace BizHawk.Client.EmuHawk
 			if (bot._bestRecording != null)
 			{
 				bot._bestRecording.AttemptAfter.is_Reset = false;
-				if (bot.IsBetter(bot._bestBotAttempt, bot._gaBestAttempt))
+				if (bot.IsBetter(bot._bestBotAttempt, bot._bestRecordingAttempt))
 				{
 					distanceFromTargetValue = bot.GetBetterValue(bot._bestAttempt, bot._bestRecording.AttemptAfter);
 					if (distanceFromTargetValue <= double.Epsilon)

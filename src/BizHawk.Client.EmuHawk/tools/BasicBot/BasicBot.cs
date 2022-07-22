@@ -533,7 +533,7 @@ namespace BizHawk.Client.EmuHawk
 			_currentBotAttempt.is_Reset = true;
 		}
 
-		protected virtual void copy_GA_to_best()
+		protected virtual void copy_curent_to_best()
 		{
 			_bestBotAttempt.Attempt = _currentBotAttempt.Attempt;
 			_bestBotAttempt.Maximize = _currentBotAttempt.Maximize;
@@ -839,7 +839,7 @@ namespace BizHawk.Client.EmuHawk
 
 					if (_bestBotAttempt.is_Reset || IsBetter(_bestBotAttempt, _currentBotAttempt))
 					{
-						copy_GA_to_best();
+						copy_curent_to_best();
 						UpdateBestAttempt();
 					}
 
@@ -902,6 +902,7 @@ namespace BizHawk.Client.EmuHawk
 			if (!_bestBotAttempt.is_Reset)
 			{
 				ClearBestButton.Enabled = true;
+				btnCopyBestInput.Enabled = true;
 				BestAttemptNumberLabel.Text = _bestBotAttempt.Attempt.ToString();
 				BestMaximizeBox.Text = _bestBotAttempt.Maximize.ToString();
 				BestTieBreak1Box.Text = _bestBotAttempt.TieBreak1.ToString();
@@ -927,6 +928,7 @@ namespace BizHawk.Client.EmuHawk
 				BestTieBreak3Box.Text = "";
 				BestAttemptLogLabel.Text = "";
 				PlayBestButton.Enabled = false;
+				btnCopyBestInput.Enabled = false;
 			}
 		}
 
