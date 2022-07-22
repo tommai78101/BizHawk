@@ -533,7 +533,7 @@ namespace BizHawk.Client.EmuHawk
 			_currentBotAttempt.is_Reset = true;
 		}
 
-		protected virtual void copy_curent_to_best()
+		protected virtual void copy_GA_to_best()
 		{
 			_bestBotAttempt.Attempt = _currentBotAttempt.Attempt;
 			_bestBotAttempt.Maximize = _currentBotAttempt.Maximize;
@@ -839,7 +839,7 @@ namespace BizHawk.Client.EmuHawk
 
 					if (_bestBotAttempt.is_Reset || IsBetter(_bestBotAttempt, _currentBotAttempt))
 					{
-						copy_curent_to_best();
+						copy_GA_to_best();
 						UpdateBestAttempt();
 					}
 
@@ -908,6 +908,7 @@ namespace BizHawk.Client.EmuHawk
 				BestTieBreak2Box.Text = _bestBotAttempt.TieBreak2.ToString();
 				BestTieBreak3Box.Text = _bestBotAttempt.TieBreak3.ToString();
 
+				Console.WriteLine($"Logging attempt:  Log size: {this._bestBotAttempt.Log.Count}");
 				var sb = new StringBuilder();
 				foreach (var logEntry in _bestBotAttempt.Log)
 				{

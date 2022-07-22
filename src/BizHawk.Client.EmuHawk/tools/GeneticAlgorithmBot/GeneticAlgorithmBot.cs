@@ -50,6 +50,7 @@ namespace BizHawk.Client.EmuHawk
 		public IList<string> ControllerButtons => Emulator.ControllerDefinition.BoolButtons;
 		public BotAttempt _bestAttempt => _bestBotAttempt;
 		public InputRecording _bestRecording => ((InputRecording) this.ga.BestChromosome);
+		public FrameInput[] _lastKnownBestBuffer { get; set; }
 		public BotAttempt _gaBestAttempt => ((InputRecording) this.ga.BestChromosome).AttemptAfter;
 
 		private GeneticAlgorithm ga;
@@ -86,6 +87,7 @@ namespace BizHawk.Client.EmuHawk
 			_gaNumberOfGenerations = 0;
 			this.fitnessManager = new InputFitnessEvaluator(this);
 			InputRecording adamChromosome = new InputRecording(this, _startFrame, FrameLength);
+			adamChromosome.RandomizeInputRecording();
 			adamChromosome.SetBeforeAttempt(MaximizeValue, TieBreaker1Value, TieBreaker2Value, TieBreaker3Value);
 
 			// This operators are classic genetic algorithm operators that lead to a good solution on TSP,
@@ -98,16 +100,9 @@ namespace BizHawk.Client.EmuHawk
 			this.ga.Termination = new GenerationNumberTermination(this._gaNumberOfGenerations + 1);
 			this.ga.GenerationRan += (sender, e) =>
 			{
-				if (this._bestBotAttempt.is_Reset || IsBetter(this._bestBotAttempt, this._gaBestAttempt))
-				{
-					copy_curent_to_best();
-					UpdateBestAttempt();
-					Console.WriteLine($"Found best attempt!");
-				}
-				Console.WriteLine($"Generation: {this.ga.GenerationsNumber}\t\t{MaximizeValue}");
-
 				if (!this.generationIsReady)
 				{
+					Console.WriteLine($"Generation: {this.ga.GenerationsNumber}\t\t{MaximizeValue}");
 					this._gaNumberOfGenerations++;
 					this.generationIsReady = true;
 				}
@@ -180,9 +175,13 @@ namespace BizHawk.Client.EmuHawk
 					Frames += FrameLength;
 
 					PlayBestButton.Enabled = true;
-					copy_current_to_GA();
-					if (this._bestBotAttempt.is_Reset || IsBetter(this._bestBotAttempt, this._gaBestAttempt))
+
+					write_bot_attempts_to_recording();
+					if (this._bestBotAttempt.is_Reset || IsBetter(this._bestBotAttempt, this._bestRecording.AttemptAfter))
 					{
+						Console.WriteLine($"Found best attempt! {this.ga.GenerationsNumber}\t\t{MaximizeValue}");
+						copy_recording_to_GA();
+						copy_recording_to_last_known_buffer();
 						UpdateBestAttemptUI();
 					}
 
@@ -209,7 +208,7 @@ namespace BizHawk.Client.EmuHawk
 				{
 					PressButtons(false);
 					_lastFrameAdvanced = Emulator.Frame;
-					copy_current_to_GA();
+					copy_recording_to_GA();
 				}
 			}
 		}
@@ -234,6 +233,7 @@ namespace BizHawk.Client.EmuHawk
 		{
 			Invoke((MethodInvoker) (() =>
 			{
+				copy_GA_to_best();
 				UpdateBestAttempt();
 			}));
 		}
@@ -269,7 +269,21 @@ namespace BizHawk.Client.EmuHawk
 			return comparison.TieBreak3 - current.TieBreak3;
 		}
 
-		protected override void copy_curent_to_best()
+		public void CopyBuffer(out FrameInput[] target)
+		{
+			int length = this._lastKnownBestBuffer?.Length ?? this.FrameLength;
+			target = new FrameInput[length];
+			if (this._lastKnownBestBuffer != null && this._lastKnownBestBuffer.Length > 0)
+			{
+				// Only copy the buffer up to the lowest common denominator length.
+				for (int i = 0; i < length; i++)
+				{
+					target[i] = this._lastKnownBestBuffer[i];
+				}
+			}
+		}
+
+		public void copy_GA_to_best()
 		{
 			this._bestBotAttempt.Attempt = this._gaBestAttempt.Attempt;
 			this._bestBotAttempt.Maximize = this._gaBestAttempt.Maximize;
@@ -285,13 +299,24 @@ namespace BizHawk.Client.EmuHawk
 			this._bestBotAttempt.is_Reset = false;
 		}
 
-		protected void copy_current_to_GA()
+		private void copy_recording_to_GA()
 		{
-			this._gaBestAttempt.Attempt = Attempts;
-			this._gaBestAttempt.Maximize = MaximizeValue;
-			this._gaBestAttempt.TieBreak1 = TieBreaker1Value;
-			this._gaBestAttempt.TieBreak2 = TieBreaker2Value;
-			this._gaBestAttempt.TieBreak3 = TieBreaker3Value;
+			this._gaBestAttempt.Attempt = this._bestRecording.AttemptAfter.Attempt;
+			this._gaBestAttempt.Maximize = this._bestRecording.AttemptAfter.Maximize;
+			this._gaBestAttempt.TieBreak1 = this._bestRecording.AttemptAfter.TieBreak1;
+			this._gaBestAttempt.TieBreak2 = this._bestRecording.AttemptAfter.TieBreak2;
+			this._gaBestAttempt.TieBreak3 = this._bestRecording.AttemptAfter.TieBreak3;
+		}
+
+		private void copy_recording_to_last_known_buffer()
+		{
+			this._lastKnownBestBuffer = new FrameInput[this._bestRecording.InputBuffer.Length];
+			this._bestRecording.InputBuffer.CopyTo(this._lastKnownBestBuffer, 0);
+		}
+
+		private void write_bot_attempts_to_recording()
+		{
+			this._bestRecording.SetAfterAttempt(MaximizeValue, TieBreaker1Value, TieBreaker2Value, TieBreaker3Value);
 		}
 	}
 
@@ -400,7 +425,7 @@ namespace BizHawk.Client.EmuHawk
 			int index = frameNumber - this.StartFrameNumber;
 			if (index < 0 || index >= this.InputBuffer.Length)
 			{
-				index = this.InputBuffer.Count() - 1;
+				index = this.InputBuffer.Length - 1;
 			}
 			return this.InputBuffer[index];
 		}
@@ -421,7 +446,7 @@ namespace BizHawk.Client.EmuHawk
 			float[] probabilities = bot.GetCachedInputProbabilities();
 			IList<int[]> a = Enumerable.Range(0, this.bot.FrameLength).Select(run =>
 			{
-				int[] times = Enumerable.Range(0, count: ControllerButtons.Count)
+				int[] times = Enumerable.Range(0, ControllerButtons.Count)
 					.Where((buttonIndex, i) => RandomizationProvider.Current.GetDouble() < probabilities[buttonIndex])
 					.ToArray();
 				return times;
@@ -437,7 +462,7 @@ namespace BizHawk.Client.EmuHawk
 			for (int i = 0; i < length; i++)
 			{
 				FrameInput input = this.GetFrameInput(this.StartFrameNumber + i);
-				for (int j = 0; j < ControllerButtons.Count; j++)
+				for (int j = 0; j < values[i].Length; j++)
 				{
 					input.Pressed(ControllerButtons[values[i][j]]);
 				}
@@ -446,7 +471,7 @@ namespace BizHawk.Client.EmuHawk
 
 		public void RandomizeFrameInput()
 		{
-			int frameNumber = RandomizationProvider.Current.GetInt(bot._startFrame, bot._startFrame + this.InputBuffer.Count());
+			int frameNumber = RandomizationProvider.Current.GetInt(bot._startFrame, bot._startFrame + this.InputBuffer.Length);
 			int index = frameNumber - bot._startFrame;
 			FrameInput input = this.GetFrameInput(frameNumber);
 			input.Clear();
@@ -470,6 +495,16 @@ namespace BizHawk.Client.EmuHawk
 		public override IChromosome CreateNew()
 		{
 			InputRecording copy = new InputRecording(this.bot, this.bot._startFrame, this.InputBuffer.Length);
+			if (this.bot._lastKnownBestBuffer != null)
+			{
+				FrameInput[] target = new FrameInput[this.bot._lastKnownBestBuffer?.Length ?? this.bot.FrameLength];
+				this.bot.CopyBuffer(out target);
+				target.CopyTo(copy.InputBuffer, 0);
+			}
+			else
+			{
+				this.InputBuffer.CopyTo(copy.InputBuffer, 0);
+			}
 			copy.RandomizeFrameInput();
 			return copy;
 		}
